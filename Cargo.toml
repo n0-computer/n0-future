@@ -8,7 +8,7 @@ derive_more = { version = "1", features = ["debug", "display"] }
 futures-buffered = "0.2.8"
 futures-lite = "2.5"
 futures-sink = "0.3"
-futures-util = "0.3"
+futures-util = { version = "0.3", features = ["sink"] }
 tokio = { version = "1", features = [] }
 tokio-util = { version = "0.7", features = [] }
 

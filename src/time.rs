@@ -1,6 +1,8 @@
 //! Sleep and timeout utilities that work natively (via tokio) and in the browser.
 
 #[cfg(not(wasm_browser))]
+pub use std::time::SystemTime;
+#[cfg(not(wasm_browser))]
 pub use tokio::time::{
     error::Elapsed, interval, interval_at, sleep, sleep_until, timeout, Duration, Instant,
     Interval, MissedTickBehavior, Sleep, Timeout,
@@ -9,7 +11,7 @@ pub use tokio::time::{
 #[cfg(wasm_browser)]
 pub use wasm::{
     error::Elapsed, interval, interval_at, sleep, sleep_until, timeout, Duration, Instant,
-    Interval, MissedTickBehavior, Sleep, Timeout,
+    Interval, MissedTickBehavior, Sleep, SystemTime, Timeout,
 };
 
 #[cfg(wasm_browser)]
@@ -27,7 +29,7 @@ mod wasm {
     };
     use wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue};
 
-    pub use web_time::{Duration, Instant};
+    pub use web_time::{Duration, Instant, SystemTime};
 
     /// Future that will wake up once its deadline is reached.
     #[derive(Debug)]

@@ -12,3 +12,33 @@
 
 pub mod task;
 pub mod time;
+
+// futures-* re-exports
+
+pub use futures_buffered::*;
+pub use futures_lite::{future, io, Future, FutureExt, Stream, StreamExt};
+pub use futures_sink::*;
+pub use futures_util::future::Either;
+pub use futures_util::SinkExt;
+
+/// Implementation and types for splitting a `Stream + Sink`.
+/// See [`split::split`].
+pub mod split {
+    pub use futures_util::stream::{SplitSink, SplitStream};
+
+    use crate::{Sink, Stream};
+
+    /// Splits a `Stream + Sink` object into separate `Sink` and `Stream`
+    /// objects.
+    ///
+    /// This can be useful when you want to split ownership between tasks, or
+    /// allow direct interaction between the two objects (e.g. via
+    /// `Sink::send_all`).
+    pub fn split<S, SinkItem>(stream_sink: S) -> (SplitSink<S, SinkItem>, SplitStream<S>)
+    where
+        S: Stream + Sized + Sink<SinkItem>,
+    {
+        use futures_util::stream::StreamExt as _;
+        stream_sink.split()
+    }
+}
