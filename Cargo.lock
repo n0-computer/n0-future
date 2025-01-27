@@ -296,7 +296,6 @@ dependencies = [
  "derive_more",
  "futures-buffered",
  "futures-lite",
- "futures-sink",
  "futures-util",
  "js-sys",
  "pin-project",

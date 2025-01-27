@@ -8,7 +8,7 @@ This crate is supposed to fulfill two purposes:
 
 ## About safer `future`-related code
 
-We re-expose `futures-lite`, `futures-sink`, `futures-buffered` and `futures-util` (but mostly for the `Sink` combinators).
+We re-expose `futures-lite`, `futures-buffered` and `futures-util` (but mostly for `Sink` and its combinators).
 If you're wondering why we're not re-exposing/using X Y or Z, please first read our article about some of our challenges with async rust: https://www.iroh.computer/blog/async-rust-challenges-in-iroh
 
 ## About easier Wasm-compatible code
