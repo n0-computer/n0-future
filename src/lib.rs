@@ -16,7 +16,7 @@ pub mod time;
 // futures-* re-exports
 
 pub use futures_buffered::*;
-pub use futures_lite::{future, io, Future, FutureExt, Stream, StreamExt};
+pub use futures_lite::{future, io, stream, Future, FutureExt, Stream, StreamExt};
 pub use futures_sink::*;
 pub use futures_util::future::Either;
 pub use futures_util::SinkExt;
@@ -41,4 +41,29 @@ pub mod split {
         use futures_util::stream::StreamExt as _;
         stream_sink.split()
     }
+}
+
+/// Re-exports boxed versions of [`Future`] and [`Stream`] traits
+/// that are `Send` in non-wasm and `!Send` in wasm.
+///
+/// If you don't want this type of target-dependend `Send` and `!Send`,
+/// use [`stream::Boxed`]/[`stream::BoxedLocal`] and
+/// [`future::Boxed`]/[`future::BoxedLocal`].
+///
+/// [`Future`]: futures_lite::Future
+/// [`Stream`]: futures_lite::Stream
+/// [`stream::Boxed`]: crate::stream::Boxed
+/// [`stream::BoxedLocal`]: crate::stream::BoxedLocal
+/// [`future::Boxed`]: crate::future::Boxed
+/// [`future::BoxedLocal`]: crate::future::BoxedLocal
+pub mod boxed {
+    #[cfg(not(wasm_browser))]
+    pub use futures_lite::future::Boxed as BoxFuture;
+    #[cfg(wasm_browser)]
+    pub use futures_lite::future::BoxedLocal as BoxFuture;
+
+    #[cfg(not(wasm_browser))]
+    pub use futures_lite::stream::Boxed as BoxStream;
+    #[cfg(wasm_browser)]
+    pub use futures_lite::stream::BoxedLocal as BoxStream;
 }
