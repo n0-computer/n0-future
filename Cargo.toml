@@ -7,7 +7,7 @@ description = "Number 0's way of doing rust futures. Re-exports what we think ar
 license = "MIT OR Apache-2.0"
 authors = ["Philipp Krüger <philipp@n0.computer>", "n0 team"]
 repository = "https://github.com/n0-computer/n0-future"
-keywords = ["async", "wasm", "webassembly", "utility", "futures", "io", "stream", "sink", "runtime"]
+keywords = ["wasm", "io", "stream", "sink", "runtime"]
 
 [dependencies]
 derive_more = { version = "1", features = ["debug", "display"] }
