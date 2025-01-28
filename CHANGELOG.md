@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [0.1.0](https://github.com/n0-computer/n0-future/compare/v0.0.1..v0.1.0) - 2025-01-28
 
 ### ⛰️  Features
 
