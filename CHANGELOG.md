@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.1](https://github.com/n0-computer/n0-future/compare/v0.1.0..0.1.1) - 2025-01-28
+
+### ⛰️  Features
+
+- Also expose `TryFutureExt` and `TryStreamExt` - ([fdbce1c](https://github.com/n0-computer/n0-future/commit/fdbce1c6c11947a2673b74f3d5ed83fb0cdf5fac))
+
 ## [0.1.0](https://github.com/n0-computer/n0-future/compare/v0.0.1..v0.1.0) - 2025-01-28
 
 ### ⛰️  Features
