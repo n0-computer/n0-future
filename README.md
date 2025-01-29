@@ -29,6 +29,13 @@ We do this in a couple of ways:
 
 It's entirely possible that we'll expand the scope of this library, that currently is mostly a re-exports crate to a crate that provides our own flavor of async APIs that we deem are safer to use, we write about some of these ideas in this issue: https://github.com/n0-computer/iroh/issues/2979
 
+## Note to Maintainers: Creating a release
+
+- Make sure to have `git-cliff`, `cargo-release` and `cargo-semver-checks` installed.
+- Figure out whether this release is major/minor/patch by running `cargo semver-checks check-release --release-type=major/minor/patch` and see which one fits
+- Run `cargo release major/minor/patch` to check if the release would go through well.
+- Run `cargo release major/minor/patch --execute` to run the release
+
 ## License
 
 Copyright 2024 N0, INC.
