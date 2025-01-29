@@ -1,6 +1,12 @@
 # Changelog
 
-## [0.1.1](https://github.com/n0-computer/n0-future/compare/v0.1.0..0.1.1) - 2025-01-28
+## [0.1.2](https://github.com/n0-computer/n0-future/compare/v0.1.1..0.1.2) - 2025-01-29
+
+### ⛰️  Features
+
+- Implement `std::error::Error` for error types - ([14eb141](https://github.com/n0-computer/n0-future/commit/14eb14166b67e405dc98c6cda2501e186d9b24b6))
+
+## [0.1.1](https://github.com/n0-computer/n0-future/compare/v0.1.0..v0.1.1) - 2025-01-28
 
 ### ⛰️  Features
 
