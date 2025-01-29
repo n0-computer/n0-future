@@ -256,6 +256,8 @@ mod wasm {
         Cancelled,
     }
 
+    impl std::error::Error for JoinError {}
+
     impl JoinError {
         /// Returns whether this join error is due to cancellation.
         ///

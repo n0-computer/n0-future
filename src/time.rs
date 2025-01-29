@@ -190,8 +190,11 @@ mod wasm {
     /// Error structs for time utilities (wasm mirror for `tokio::time::error`).
     pub mod error {
         /// Error when a timeout is elapsed.
-        #[derive(Debug)]
+        #[derive(Debug, derive_more::Display)]
+        #[display("deadline has elapsed")]
         pub struct Elapsed;
+
+        impl std::error::Error for Elapsed {}
     }
 
     /// Timeout of a function in wasm.
