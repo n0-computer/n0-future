@@ -11,16 +11,16 @@ keywords = ["wasm", "io", "stream", "sink", "runtime"]
 
 [dependencies]
 derive_more = { version = "1", features = ["debug", "display"] }
-futures-buffered = "0.2.8"
+futures-buffered = "0.2.11"
 futures-lite = "2.5"
 futures-util = { version = "0.3", features = ["sink"] }
-tokio = { version = "1", features = [] }
-tokio-util = { version = "0.7", features = [] }
+tokio = { version = "1.28", features = [] }
+tokio-util = { version = "0.7.14", features = [] }
 
 # non-wasm-in-browser dependencies
 [target.'cfg(not(all(target_family = "wasm", target_os = "unknown")))'.dependencies]
-tokio = { version = "1", features = ["rt", "time"] }
-tokio-util = { version = "0.7", features = ["rt"] }
+tokio = { version = "1.28", features = ["rt", "time"] }
+tokio-util = { version = "0.7.14", features = ["rt"] }
 
 # wasm-in-browser dependencies
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
