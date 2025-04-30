@@ -1,6 +1,12 @@
 # Changelog
 
-## [0.1.2](https://github.com/n0-computer/n0-future/compare/v0.1.1..0.1.2) - 2025-01-29
+## [0.1.3](https://github.com/n0-computer/n0-future/compare/v0.1.2..0.1.3) - 2025-04-30
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix minimal crate versions - ([179703c](https://github.com/n0-computer/n0-future/commit/179703c51ce34bb6ab4fc261c3dc812fb2df7f52))
+
+## [0.1.2](https://github.com/n0-computer/n0-future/compare/v0.1.1..v0.1.2) - 2025-01-29
 
 ### ⛰️  Features
 
