@@ -541,6 +541,8 @@ mod wasm {
 
 #[cfg(test)]
 mod test {
+    use std::time::Duration;
+
     #[cfg(not(wasm_browser))]
     use tokio::test;
     #[cfg(wasm_browser)]
@@ -550,13 +552,17 @@ mod test {
 
     #[test]
     async fn task_abort() {
-        let h1 = task::spawn(async {});
-        let h2 = task::spawn(async {});
+        let h1 = task::spawn(async {
+            crate::time::sleep(Duration::from_millis(10)).await;
+        });
+        let h2 = task::spawn(async {
+            crate::time::sleep(Duration::from_millis(10)).await;
+        });
         assert!(h1.id() != h2.id());
 
-        assert!(h2.await.is_ok());
         h1.abort();
         assert!(h1.await.err().unwrap().is_cancelled());
+        assert!(h2.await.is_ok());
     }
 
     #[test]
