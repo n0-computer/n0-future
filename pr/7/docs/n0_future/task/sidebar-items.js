@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["spawn"],"struct":["AbortOnDropHandle","Id","JoinError","JoinHandle","JoinSet"]};
+window.SIDEBAR_ITEMS = {"fn":["spawn"],"struct":["AbortHandle","AbortOnDropHandle","Id","JoinError","JoinHandle","JoinSet"]};

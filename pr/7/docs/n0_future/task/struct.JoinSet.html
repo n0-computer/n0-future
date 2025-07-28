@@ -31,26 +31,26 @@ order they complete.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.len" class="method"><h4 class="code-header">pub fn <a href="#method.len" class="fn">len</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></h4></section></summary><div class="docblock"><p>Returns the number of tasks currently in the <code>JoinSet</code>.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.is_empty" class="method"><h4 class="code-header">pub fn <a href="#method.is_empty" class="fn">is_empty</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></h4></section></summary><div class="docblock"><p>Returns whether the <code>JoinSet</code> is empty.</p>
 </div></details></div></details><details class="toggle implementors-toggle" open><summary><section id="impl-JoinSet%3CT%3E-1" class="impl"><a href="#impl-JoinSet%3CT%3E-1" class="anchor">§</a><h3 class="code-header">impl&lt;T&gt; <a class="struct" href="struct.JoinSet.html" title="struct n0_future::task::JoinSet">JoinSet</a>&lt;T&gt;<div class="where">where
-    T: 'static,</div></h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.spawn" class="method"><h4 class="code-header">pub fn <a href="#method.spawn" class="fn">spawn</a>&lt;F&gt;(&amp;mut self, task: F) -&gt; AbortHandle<div class="where">where
+    T: 'static,</div></h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.spawn" class="method"><h4 class="code-header">pub fn <a href="#method.spawn" class="fn">spawn</a>&lt;F&gt;(&amp;mut self, task: F) -&gt; <a class="struct" href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle">AbortHandle</a><div class="where">where
     F: <a class="trait" href="../trait.Future.html" title="trait n0_future::Future">Future</a>&lt;Output = T&gt; + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'static,
-    T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a>,</div></h4></section></summary><div class="docblock"><p>Spawn the provided task on the <code>JoinSet</code>, returning an <a href="crate::task::AbortHandle"><code>AbortHandle</code></a>
+    T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a>,</div></h4></section></summary><div class="docblock"><p>Spawn the provided task on the <code>JoinSet</code>, returning an <a href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle"><code>AbortHandle</code></a>
 that can be used to remotely cancel the task.</p>
 <p>The provided future will start running in the background immediately
 when this method is called, even if you don’t await anything on this
 <code>JoinSet</code>.</p>
 <h5 id="panics"><a class="doc-anchor" href="#panics">§</a>Panics</h5>
 <p>This method panics if called outside of a Tokio runtime.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.spawn_on" class="method"><h4 class="code-header">pub fn <a href="#method.spawn_on" class="fn">spawn_on</a>&lt;F&gt;(&amp;mut self, task: F, handle: &amp;Handle) -&gt; AbortHandle<div class="where">where
+</div></details><details class="toggle method-toggle" open><summary><section id="method.spawn_on" class="method"><h4 class="code-header">pub fn <a href="#method.spawn_on" class="fn">spawn_on</a>&lt;F&gt;(&amp;mut self, task: F, handle: &amp;Handle) -&gt; <a class="struct" href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle">AbortHandle</a><div class="where">where
     F: <a class="trait" href="../trait.Future.html" title="trait n0_future::Future">Future</a>&lt;Output = T&gt; + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'static,
     T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a>,</div></h4></section></summary><div class="docblock"><p>Spawn the provided task on the provided runtime and store it in this
-<code>JoinSet</code> returning an <a href="crate::task::AbortHandle"><code>AbortHandle</code></a> that can be used to remotely
+<code>JoinSet</code> returning an <a href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle"><code>AbortHandle</code></a> that can be used to remotely
 cancel the task.</p>
 <p>The provided future will start running in the background immediately
 when this method is called, even if you don’t await anything on this
 <code>JoinSet</code>.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.spawn_local" class="method"><h4 class="code-header">pub fn <a href="#method.spawn_local" class="fn">spawn_local</a>&lt;F&gt;(&amp;mut self, task: F) -&gt; AbortHandle<div class="where">where
+</div></details><details class="toggle method-toggle" open><summary><section id="method.spawn_local" class="method"><h4 class="code-header">pub fn <a href="#method.spawn_local" class="fn">spawn_local</a>&lt;F&gt;(&amp;mut self, task: F) -&gt; <a class="struct" href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle">AbortHandle</a><div class="where">where
     F: <a class="trait" href="../trait.Future.html" title="trait n0_future::Future">Future</a>&lt;Output = T&gt; + 'static,</div></h4></section></summary><div class="docblock"><p>Spawn the provided task on the current <a href="crate::task::LocalSet"><code>LocalSet</code></a> and store it in this
-<code>JoinSet</code>, returning an <a href="crate::task::AbortHandle"><code>AbortHandle</code></a> that can be used to remotely
+<code>JoinSet</code>, returning an <a href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle"><code>AbortHandle</code></a> that can be used to remotely
 cancel the task.</p>
 <p>The provided future will start running in the background immediately
 when this method is called, even if you don’t await anything on this
@@ -61,17 +61,17 @@ when this method is called, even if you don’t await anything on this
     &amp;mut self,
     task: F,
     local_set: &amp;LocalSet,
-) -&gt; AbortHandle<div class="where">where
+) -&gt; <a class="struct" href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle">AbortHandle</a><div class="where">where
     F: <a class="trait" href="../trait.Future.html" title="trait n0_future::Future">Future</a>&lt;Output = T&gt; + 'static,</div></h4></section></summary><div class="docblock"><p>Spawn the provided task on the provided <a href="crate::task::LocalSet"><code>LocalSet</code></a> and store it in
-this <code>JoinSet</code>, returning an <a href="crate::task::AbortHandle"><code>AbortHandle</code></a> that can be used to
+this <code>JoinSet</code>, returning an <a href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle"><code>AbortHandle</code></a> that can be used to
 remotely cancel the task.</p>
 <p>Unlike the <a href="struct.JoinSet.html#method.spawn_local" title="method n0_future::task::JoinSet::spawn_local"><code>spawn_local</code></a> method, this method may be used to spawn local
 tasks on a <code>LocalSet</code> that is <em>not</em> currently running. The provided
 future will start running whenever the <code>LocalSet</code> is next started.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.spawn_blocking" class="method"><h4 class="code-header">pub fn <a href="#method.spawn_blocking" class="fn">spawn_blocking</a>&lt;F&gt;(&amp;mut self, f: F) -&gt; AbortHandle<div class="where">where
+</div></details><details class="toggle method-toggle" open><summary><section id="method.spawn_blocking" class="method"><h4 class="code-header">pub fn <a href="#method.spawn_blocking" class="fn">spawn_blocking</a>&lt;F&gt;(&amp;mut self, f: F) -&gt; <a class="struct" href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle">AbortHandle</a><div class="where">where
     F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; T + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'static,
     T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a>,</div></h4></section></summary><div class="docblock"><p>Spawn the blocking code on the blocking threadpool and store
-it in this <code>JoinSet</code>, returning an <a href="crate::task::AbortHandle"><code>AbortHandle</code></a> that can be
+it in this <code>JoinSet</code>, returning an <a href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle"><code>AbortHandle</code></a> that can be
 used to remotely cancel the task.</p>
 <h5 id="examples-1"><a class="doc-anchor" href="#examples-1">§</a>Examples</h5>
 <p>Spawn multiple blocking tasks and wait for them.</p>
@@ -98,11 +98,11 @@ used to remotely cancel the task.</p>
 }</code></pre></div>
 <h5 id="panics-2"><a class="doc-anchor" href="#panics-2">§</a>Panics</h5>
 <p>This method panics if called outside of a Tokio runtime.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.spawn_blocking_on" class="method"><h4 class="code-header">pub fn <a href="#method.spawn_blocking_on" class="fn">spawn_blocking_on</a>&lt;F&gt;(&amp;mut self, f: F, handle: &amp;Handle) -&gt; AbortHandle<div class="where">where
+</div></details><details class="toggle method-toggle" open><summary><section id="method.spawn_blocking_on" class="method"><h4 class="code-header">pub fn <a href="#method.spawn_blocking_on" class="fn">spawn_blocking_on</a>&lt;F&gt;(&amp;mut self, f: F, handle: &amp;Handle) -&gt; <a class="struct" href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle">AbortHandle</a><div class="where">where
     F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; T + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + 'static,
     T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a>,</div></h4></section></summary><div class="docblock"><p>Spawn the blocking code on the blocking threadpool of the
 provided runtime and store it in this <code>JoinSet</code>, returning an
-<a href="crate::task::AbortHandle"><code>AbortHandle</code></a> that can be used to remotely cancel the task.</p>
+<a href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle"><code>AbortHandle</code></a> that can be used to remotely cancel the task.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.join_next" class="method"><h4 class="code-header">pub async fn <a href="#method.join_next" class="fn">join_next</a>(&amp;mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;T, <a class="struct" href="struct.JoinError.html" title="struct n0_future::task::JoinError">JoinError</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Waits until one of the tasks in the set completes and returns its output.</p>
 <p>Returns <code>None</code> if the set is empty.</p>
 <h5 id="cancel-safety"><a class="doc-anchor" href="#cancel-safety">§</a>Cancel Safety</h5>

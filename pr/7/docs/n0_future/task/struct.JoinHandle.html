@@ -153,7 +153,7 @@ completed.</p>
 time::sleep(time::Duration::from_secs(<span class="number">1</span>)).<span class="kw">await</span>;
 <span class="macro">assert!</span>(handle1.is_finished());
 <span class="macro">assert!</span>(handle2.is_finished());</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.abort_handle" class="method"><h4 class="code-header">pub fn <a href="#method.abort_handle" class="fn">abort_handle</a>(&amp;self) -&gt; AbortHandle</h4></section></summary><div class="docblock"><p>Returns a new <code>AbortHandle</code> that can be used to remotely abort this task.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.abort_handle" class="method"><h4 class="code-header">pub fn <a href="#method.abort_handle" class="fn">abort_handle</a>(&amp;self) -&gt; <a class="struct" href="struct.AbortHandle.html" title="struct n0_future::task::AbortHandle">AbortHandle</a></h4></section></summary><div class="docblock"><p>Returns a new <code>AbortHandle</code> that can be used to remotely abort this task.</p>
 <p>Awaiting a task cancelled by the <code>AbortHandle</code> might complete as usual if the task was
 already completed at the time it was cancelled, but most likely it
 will fail with a <a href="struct.JoinError.html#method.is_cancelled" title="method n0_future::task::JoinError::is_cancelled">cancelled</a> <code>JoinError</code>.</p>
