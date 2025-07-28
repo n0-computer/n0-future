@@ -7,7 +7,6 @@ pub use tokio::spawn;
 pub use tokio::task::{JoinError, JoinHandle, JoinSet};
 #[cfg(not(wasm_browser))]
 pub use tokio_util::task::AbortOnDropHandle;
-
 #[cfg(wasm_browser)]
 pub use wasm::*;
 

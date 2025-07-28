@@ -59,7 +59,6 @@ pub mod boxed {
     pub use futures_lite::future::Boxed as BoxFuture;
     #[cfg(wasm_browser)]
     pub use futures_lite::future::BoxedLocal as BoxFuture;
-
     #[cfg(not(wasm_browser))]
     pub use futures_lite::stream::Boxed as BoxStream;
     #[cfg(wasm_browser)]
