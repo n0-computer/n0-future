@@ -25,7 +25,8 @@ use pin_project::pin_project;
 ///
 /// ```
 /// use std::time::Duration;
-/// use n0_future::{MaybeFuture, task, time};
+///
+/// use n0_future::{task, time, MaybeFuture};
 ///
 /// # #[tokio::main(flavor = "current_thread", start_paused = true)]
 /// # async fn main() {
@@ -137,9 +138,8 @@ impl<T: Future> Future for MaybeFuture<T> {
 mod tests {
     use std::pin::pin;
 
-    use crate::time::Duration;
-
     use super::*;
+    use crate::time::Duration;
 
     #[tokio::test(start_paused = true)]
     async fn test_maybefuture_poll_after_use() {
@@ -169,8 +169,9 @@ mod tests {
 
     #[tokio::test(start_paused = true)]
     async fn example() {
-        use crate::{task, time};
         use std::time::Duration;
+
+        use crate::{task, time};
 
         let start = time::Instant::now();
 
