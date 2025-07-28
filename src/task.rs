@@ -326,12 +326,12 @@ mod wasm {
     #[derive(derive_more::Display, Debug, Clone, Copy)]
     #[display("{reason}")]
     pub struct JoinError {
-        reason: JoinErrorReason,
+        cause: JoinErrorCause,
         id: Id,
     }
 
     #[derive(derive_more::Display, Debug, Clone, Copy)]
-    enum JoinErrorReason {
+    enum JoinErrorCause {
         /// The error that's returned when the task that's being waited on
         /// has been cancelled.
         #[display("task was cancelled")]
@@ -347,7 +347,7 @@ mod wasm {
         /// unwind panics in tasks.
         /// All panics just happen on the main thread anyways.
         pub fn is_cancelled(&self) -> bool {
-            matches!(self.reason, JoinErrorReason::Cancelled)
+            matches!(self.cause, JoinErrorCause::Cancelled)
         }
 
         /// Returns whether this is a panic. Always `false` in Wasm,
@@ -370,7 +370,7 @@ mod wasm {
             let mut state = self.task.state.borrow_mut();
             if state.cancelled {
                 return Poll::Ready(Err(JoinError {
-                    reason: JoinErrorReason::Cancelled,
+                    cause: JoinErrorCause::Cancelled,
                     id: state.id,
                 }));
             }
