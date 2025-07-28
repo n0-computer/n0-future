@@ -10,6 +10,8 @@
 #![cfg_attr(not(test), deny(clippy::unwrap_used))]
 #![cfg_attr(n0_future_docsrs, feature(doc_auto_cfg))]
 
+mod maybe_future;
+
 pub mod task;
 pub mod time;
 
@@ -18,6 +20,7 @@ pub mod time;
 pub use futures_buffered::*;
 pub use futures_lite::{future, io, pin, ready, stream, Future, FutureExt, Stream, StreamExt};
 pub use futures_util::{future::Either, Sink, SinkExt, TryFutureExt, TryStreamExt};
+pub use maybe_future::MaybeFuture;
 
 /// Implementation and types for splitting a `Stream + Sink`.
 /// See [`split::split`].
