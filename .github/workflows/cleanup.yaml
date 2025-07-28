@@ -1,5 +1,3 @@
-# Run tests using the beta Rust compiler
-
 name: Cleanup
 
 on:
@@ -39,7 +37,3 @@ jobs:
           git add .
           git commit -m "Cleanup old docs"
           git push
-
-
-
-
