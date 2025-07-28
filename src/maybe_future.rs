@@ -134,7 +134,7 @@ impl<T: Future> Future for MaybeFuture<T> {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(not(wasm_browser), test))]
 mod tests {
     use std::pin::pin;
 

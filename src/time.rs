@@ -251,7 +251,7 @@ mod wasm {
         #[default]
         Burst,
 
-        /// Tick at multiples of `period` from when [`tick`] was called, rather than
+        /// Tick at multiples of `period` from when [`Interval::tick`] was called, rather than
         /// from `start`.
         Delay,
 

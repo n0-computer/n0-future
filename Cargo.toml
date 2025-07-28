@@ -14,7 +14,7 @@ rust-version = "1.81"
 
 
 [dependencies]
-derive_more = { version = "1", features = ["debug", "display"] }
+derive_more = { version = "1", features = ["debug", "deref", "display"] }
 futures-buffered = "0.2.12"
 futures-lite = "2.5"
 futures-util = { version = "0.3", features = ["sink"] }
@@ -36,6 +36,10 @@ wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 web-time = "1"
 send_wrapper = "0.6"
+
+# wasm-in-browser dev dependencies
+[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies]
+wasm-bindgen-test = "0.3.50"
 
 [build-dependencies]
 cfg_aliases = { version = "0.2" }
