@@ -324,7 +324,7 @@ mod wasm {
 
     /// An error that can occur when waiting for the completion of a task.
     #[derive(derive_more::Display, Debug, Clone, Copy)]
-    #[display("{reason}")]
+    #[display("{cause}")]
     pub struct JoinError {
         cause: JoinErrorCause,
         id: Id,
