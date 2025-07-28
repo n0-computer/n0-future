@@ -93,11 +93,6 @@ pub enum MaybeFuture<T> {
 }
 
 impl<T> MaybeFuture<T> {
-    /// Creates a [`MaybeFuture`] without an inner future.
-    pub fn none() -> Self {
-        Self::default()
-    }
-
     /// Sets the future to None again.
     pub fn set_none(mut self: Pin<&mut Self>) {
         self.as_mut().project_replace(Self::None);
@@ -146,10 +141,23 @@ mod tests {
 
     use super::*;
 
-    #[tokio::test]
+    #[tokio::test(start_paused = true)]
     async fn test_maybefuture_poll_after_use() {
         let fut = async move { "hello" };
         let mut maybe_fut = pin!(MaybeFuture::Some(fut));
+        let res = (&mut maybe_fut).await;
+
+        assert_eq!(res, "hello");
+
+        // Now poll again
+        let res = tokio::time::timeout(Duration::from_millis(10), maybe_fut).await;
+        assert!(res.is_err());
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn test_maybefuture_mut_ref() {
+        let mut fut = Box::pin(async move { "hello" });
+        let mut maybe_fut = pin!(MaybeFuture::Some(&mut fut));
         let res = (&mut maybe_fut).await;
 
         assert_eq!(res, "hello");
