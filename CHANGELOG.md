@@ -1,6 +1,20 @@
 # Changelog
 
-## [0.1.3](https://github.com/n0-computer/n0-future/compare/v0.1.2..0.1.3) - 2025-04-30
+## [0.2.0](https://github.com/n0-computer/n0-future/compare/v0.1.3..0.2.0) - 2025-07-28
+
+### ⛰️  Features
+
+- Add `MaybeFuture` ([#5](https://github.com/n0-computer/n0-future/issues/5)) - ([7e1226c](https://github.com/n0-computer/n0-future/commit/7e1226c170f894475716eabd055b5c9a6611b6c5))
+
+### ⚙️ Miscellaneous Tasks
+
+- Initial setup ([#6](https://github.com/n0-computer/n0-future/issues/6)) - ([eb25bd7](https://github.com/n0-computer/n0-future/commit/eb25bd7c7b62e2a682fcf9b5281f416997e0bd28))
+
+### Deps
+
+- Bump deps ([#4](https://github.com/n0-computer/n0-future/issues/4)) - ([e8dbee5](https://github.com/n0-computer/n0-future/commit/e8dbee5e739188ba27c7f646864a5ba81bad5bab))
+
+## [0.1.3](https://github.com/n0-computer/n0-future/compare/v0.1.2..v0.1.3) - 2025-04-30
 
 ### ⚙️ Miscellaneous Tasks
 
