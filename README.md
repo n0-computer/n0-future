@@ -4,7 +4,7 @@
 
 This crate is supposed to fulfill two purposes:
 1. Make it easier to grab one library that re-exposes some sane future/stream combinators that don't use too much unsafe code and seem safe without requiring you to install lots of small libraries.
-2. Make it easier to write asnyc code that is Wasm-compatible.
+2. Make it easier to write async code that is Wasm-compatible.
 
 ## About safer `future`-related code
 
