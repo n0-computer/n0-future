@@ -2,12 +2,12 @@
 
 #[cfg(not(wasm_browser))]
 pub use std::time::SystemTime;
+
 #[cfg(not(wasm_browser))]
 pub use tokio::time::{
     error::Elapsed, interval, interval_at, sleep, sleep_until, timeout, Duration, Instant,
     Interval, MissedTickBehavior, Sleep, Timeout,
 };
-
 #[cfg(wasm_browser)]
 pub use wasm::{
     error::Elapsed, interval, interval_at, sleep, sleep_until, timeout, Duration, Instant,
@@ -16,8 +16,6 @@ pub use wasm::{
 
 #[cfg(wasm_browser)]
 mod wasm {
-    use futures_util::task::AtomicWaker;
-    use send_wrapper::SendWrapper;
     use std::{
         future::{Future, IntoFuture},
         pin::Pin,
@@ -27,8 +25,10 @@ mod wasm {
         },
         task::{Context, Poll},
     };
-    use wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue};
 
+    use futures_util::task::AtomicWaker;
+    use send_wrapper::SendWrapper;
+    use wasm_bindgen::{closure::Closure, prelude::wasm_bindgen, JsCast, JsValue};
     pub use web_time::{Duration, Instant, SystemTime};
 
     /// Future that will wake up once its deadline is reached.
