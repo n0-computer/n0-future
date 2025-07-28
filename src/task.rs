@@ -4,7 +4,7 @@
 #[cfg(not(wasm_browser))]
 pub use tokio::spawn;
 #[cfg(not(wasm_browser))]
-pub use tokio::task::{Id, JoinError, JoinHandle, JoinSet};
+pub use tokio::task::{AbortHandle, Id, JoinError, JoinHandle, JoinSet};
 #[cfg(not(wasm_browser))]
 pub use tokio_util::task::AbortOnDropHandle;
 #[cfg(wasm_browser)]
@@ -35,14 +35,13 @@ mod wasm {
     }
 
     /// An opaque ID that uniquely identifies a task relative to all other currently running tasks.
-    #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, derive_more::Display)]
-    #[display("{_0}")]
+    #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, derive_more::Display)]
     pub struct Id(u64);
 
     /// Wasm shim for tokio's `JoinSet`.
     ///
-    /// Uses a `futures_buffered::FuturesUnordered` queue of
-    /// `JoinHandle`s inside.
+    /// Uses a [`futures_buffered::FuturesUnordered`] queue of
+    /// [`JoinHandle`]s inside.
     pub struct JoinSet<T> {
         handles: futures_buffered::FuturesUnordered<JoinHandleWithId<T>>,
         // We need to keep a second list of JoinHandles so we can access them for cancellation
@@ -71,8 +70,6 @@ mod wasm {
         }
 
         /// Spawns a task into this `JoinSet`.
-        ///
-        /// (Doesn't return an `AbortHandle` unlike the original `tokio::task::JoinSet` yet.)
         pub fn spawn(&mut self, fut: impl IntoFuture<Output = T> + 'static) -> AbortHandle
         where
             T: 'static,
@@ -225,6 +222,10 @@ mod wasm {
             self.wake();
         }
 
+        fn is_complete(&self) -> bool {
+            self.completed || self.cancelled
+        }
+
         fn wake(&mut self) {
             if let Some(waker) = self.waker_handler.take() {
                 waker.wake();
@@ -255,11 +256,10 @@ mod wasm {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             if self.task.state.valid() {
                 let state = self.task.state.borrow();
-                let cancelled = state.cancelled;
-                let completed = state.completed;
                 f.debug_struct("JoinHandle")
-                    .field("cancelled", &cancelled)
-                    .field("completed", &completed)
+                    .field("id", &state.id)
+                    .field("cancelled", &state.cancelled)
+                    .field("completed", &state.completed)
                     .finish()
             } else {
                 f.debug_tuple("JoinHandle")
@@ -290,9 +290,9 @@ mod wasm {
             self.task.state.borrow_mut().cancel();
         }
 
-        /// Returns a new `AbortHandle` that can be used to remotely abort this task.
+        /// Returns a new [`AbortHandle`] that can be used to remotely abort this task.
         ///
-        /// Awaiting a task cancelled by the `AbortHandle` might complete as usual if the task was
+        /// Awaiting a task cancelled by the [`AbortHandle`] might complete as usual if the task was
         /// already completed at the time it was cancelled, but most likely it
         /// will fail with a [cancelled] `JoinError`.
         ///
@@ -312,9 +312,14 @@ mod wasm {
             state.id
         }
 
-        fn is_running(&self) -> bool {
+        /// Checks if the task associated with this `JoinHandle` has finished.
+        pub fn is_finished(&self) -> bool {
             let state = self.task.state.borrow();
-            !state.cancelled && !state.completed
+            state.is_complete()
+        }
+
+        fn is_running(&self) -> bool {
+            !self.is_finished()
         }
     }
 
@@ -427,9 +432,26 @@ mod wasm {
     }
 
     /// An owned permission to abort a spawned task, without awaiting its completion.
-    #[derive(Debug)]
+    #[derive(Clone)]
     pub struct AbortHandle {
         state: SendWrapper<Rc<RefCell<State>>>,
+    }
+
+    impl Debug for AbortHandle {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            if self.state.valid() {
+                let state = self.state.borrow();
+                f.debug_struct("AbortHandle")
+                    .field("id", &state.id)
+                    .field("cancelled", &state.cancelled)
+                    .field("completed", &state.completed)
+                    .finish()
+            } else {
+                f.debug_tuple("AbortHandle")
+                    .field(&format_args!("<other thread>"))
+                    .finish()
+            }
+        }
     }
 
     impl AbortHandle {
@@ -456,8 +478,9 @@ mod wasm {
     /// Similar to a `JoinHandle`, except it automatically aborts
     /// the task when it's dropped.
     #[pin_project::pin_project(PinnedDrop)]
-    #[derive(derive_more::Debug)]
+    #[derive(derive_more::Debug, derive_more::Deref)]
     #[debug("AbortOnDropHandle")]
+    #[must_use = "Dropping the handle aborts the task immediately"]
     pub struct AbortOnDropHandle<T>(#[pin] JoinHandle<T>);
 
     #[pin_project::pinned_drop]
@@ -480,6 +503,24 @@ mod wasm {
         pub fn new(task: JoinHandle<T>) -> Self {
             Self(task)
         }
+
+        /// Returns a new [`AbortHandle`] that can be used to remotely abort this task,
+        /// equivalent to [`JoinHandle::abort_handle`].
+        pub fn abort_handle(&self) -> AbortHandle {
+            self.0.abort_handle()
+        }
+
+        /// Abort the task associated with this handle,
+        /// equivalent to [`JoinHandle::abort`].
+        pub fn abort(&self) {
+            self.0.abort()
+        }
+
+        /// Checks if the task associated with this handle is finished,
+        /// equivalent to [`JoinHandle::is_finished`].
+        pub fn is_finished(&self) -> bool {
+            self.0.is_finished()
+        }
     }
 
     /// Spawns a future as a task in the browser runtime.
@@ -499,13 +540,16 @@ mod wasm {
     }
 }
 
-#[cfg(all(wasm_browser, test))]
+#[cfg(test)]
 mod test {
-    use wasm_bindgen_test::wasm_bindgen_test;
+    #[cfg(not(wasm_browser))]
+    use tokio::test;
+    #[cfg(wasm_browser)]
+    use wasm_bindgen_test::wasm_bindgen_test as test;
 
     use crate::task;
 
-    #[wasm_bindgen_test]
+    #[test]
     async fn task_abort() {
         let h1 = task::spawn(async {});
         let h2 = task::spawn(async {});
@@ -516,7 +560,7 @@ mod test {
         assert!(h1.await.err().unwrap().is_cancelled());
     }
 
-    #[wasm_bindgen_test]
+    #[test]
     async fn join_set_abort() {
         let fut = || async { 22 };
         let mut set = task::JoinSet::new();

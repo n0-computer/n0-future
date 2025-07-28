@@ -14,7 +14,7 @@ rust-version = "1.81"
 
 
 [dependencies]
-derive_more = { version = "1", features = ["debug", "display"] }
+derive_more = { version = "1", features = ["debug", "deref", "display"] }
 futures-buffered = "0.2.12"
 futures-lite = "2.5"
 futures-util = { version = "0.3", features = ["sink"] }
