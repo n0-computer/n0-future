@@ -37,6 +37,10 @@ wasm-bindgen-futures = "0.4"
 web-time = "1"
 send_wrapper = "0.6"
 
+# wasm-in-browser dev dependencies
+[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies]
+wasm-bindgen-test = "0.3.50"
+
 [build-dependencies]
 cfg_aliases = { version = "0.2" }
 

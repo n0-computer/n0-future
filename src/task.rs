@@ -4,7 +4,7 @@
 #[cfg(not(wasm_browser))]
 pub use tokio::spawn;
 #[cfg(not(wasm_browser))]
-pub use tokio::task::{JoinError, JoinHandle, JoinSet};
+pub use tokio::task::{Id, JoinError, JoinHandle, JoinSet};
 #[cfg(not(wasm_browser))]
 pub use tokio_util::task::AbortOnDropHandle;
 #[cfg(wasm_browser)]
@@ -18,18 +18,33 @@ mod wasm {
         future::{Future, IntoFuture},
         pin::Pin,
         rc::Rc,
+        sync::{Mutex, OnceLock},
         task::{Context, Poll, Waker},
     };
 
-    use futures_lite::stream::StreamExt;
+    use futures_lite::{stream::StreamExt, FutureExt};
     use send_wrapper::SendWrapper;
+
+    static TASK_ID_COUNTER: OnceLock<Mutex<u64>> = OnceLock::new();
+
+    fn next_task_id() -> u64 {
+        let inner = TASK_ID_COUNTER.get_or_init(|| Mutex::new(0));
+        let mut counter = inner.lock().unwrap();
+        *counter += 1;
+        *counter
+    }
+
+    /// An opaque ID that uniquely identifies a task relative to all other currently running tasks.
+    #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, derive_more::Display)]
+    #[display("{_0}")]
+    pub struct Id(u64);
 
     /// Wasm shim for tokio's `JoinSet`.
     ///
     /// Uses a `futures_buffered::FuturesUnordered` queue of
     /// `JoinHandle`s inside.
     pub struct JoinSet<T> {
-        handles: futures_buffered::FuturesUnordered<JoinHandle<T>>,
+        handles: futures_buffered::FuturesUnordered<JoinHandleWithId<T>>,
         // We need to keep a second list of JoinHandles so we can access them for cancellation
         to_cancel: Vec<JoinHandle<T>>,
     }
@@ -58,11 +73,12 @@ mod wasm {
         /// Spawns a task into this `JoinSet`.
         ///
         /// (Doesn't return an `AbortHandle` unlike the original `tokio::task::JoinSet` yet.)
-        pub fn spawn(&mut self, fut: impl IntoFuture<Output = T> + 'static)
+        pub fn spawn(&mut self, fut: impl IntoFuture<Output = T> + 'static) -> AbortHandle
         where
             T: 'static,
         {
             let handle = JoinHandle::new();
+            let state = handle.task.state.clone();
             let handle_for_spawn = JoinHandle {
                 task: handle.task.clone(),
             };
@@ -75,8 +91,9 @@ mod wasm {
                 fut: fut.into_future(),
             });
 
-            self.handles.push(handle);
+            self.handles.push(JoinHandleWithId(handle));
             self.to_cancel.push(handle_for_cancel);
+            AbortHandle { state }
         }
 
         /// Aborts all tasks inside this `JoinSet`
@@ -97,6 +114,22 @@ mod wasm {
         /// you newly spawned a task onto it. This seems to be the usual way
         /// the `JoinSet` is used *most of the time* in the iroh codebase anyways.
         pub async fn join_next(&mut self) -> Option<Result<T, JoinError>> {
+            self.join_next_with_id()
+                .await
+                .map(|ret| ret.map(|(_id, out)| out))
+        }
+
+        /// Waits until one of the tasks in the set completes and returns its
+        /// output, along with the [task ID] of the completed task.
+        ///
+        /// Returns `None` if the set is empty.
+        ///
+        /// When this method returns an error, then the id of the task that failed can be accessed
+        /// using the [`JoinError::id`] method.
+        ///
+        /// [task ID]: crate::task::Id
+        /// [`JoinError::id`]: fn@crate::task::JoinError::id
+        pub async fn join_next_with_id(&mut self) -> Option<Result<(Id, T), JoinError>> {
             futures_lite::future::poll_fn(|cx| {
                 let ret = self.handles.poll_next(cx);
                 // clean up handles that are either cancelled or have finished
@@ -146,6 +179,10 @@ mod wasm {
 
     /// A handle to a spawned task.
     pub struct JoinHandle<T> {
+        task: Task<T>,
+    }
+
+    struct Task<T> {
         // Using SendWrapper here is safe as long as you keep all of your
         // work on the main UI worker in the browser.
         // The only exception to that being the case would be if our user
@@ -153,18 +190,29 @@ mod wasm {
         // put the instances on different Web Workers and finally shared
         // the JoinHandle across the Web Worker boundary.
         // In that case, using the JoinHandle would panic.
-        task: SendWrapper<Rc<RefCell<Task<T>>>>,
+        state: SendWrapper<Rc<RefCell<State>>>,
+        result: SendWrapper<Rc<RefCell<Option<T>>>>,
     }
 
-    struct Task<T> {
+    impl<T> Clone for Task<T> {
+        fn clone(&self) -> Self {
+            Self {
+                state: self.state.clone(),
+                result: self.result.clone(),
+            }
+        }
+    }
+
+    #[derive(Debug)]
+    struct State {
+        id: Id,
         cancelled: bool,
         completed: bool,
         waker_handler: Option<Waker>,
         waker_spawn_fn: Option<Waker>,
-        result: Option<T>,
     }
 
-    impl<T> Task<T> {
+    impl State {
         fn cancel(&mut self) {
             if !self.cancelled {
                 self.cancelled = true;
@@ -172,8 +220,7 @@ mod wasm {
             }
         }
 
-        fn complete(&mut self, value: T) {
-            self.result = Some(value);
+        fn complete(&mut self) {
             self.completed = true;
             self.wake();
         }
@@ -206,10 +253,10 @@ mod wasm {
 
     impl<T> Debug for JoinHandle<T> {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            if self.task.valid() {
-                let task = self.task.borrow();
-                let cancelled = task.cancelled;
-                let completed = task.completed;
+            if self.task.state.valid() {
+                let state = self.task.state.borrow();
+                let cancelled = state.cancelled;
+                let completed = state.completed;
                 f.debug_struct("JoinHandle")
                     .field("cancelled", &cancelled)
                     .field("completed", &completed)
@@ -225,30 +272,62 @@ mod wasm {
     impl<T> JoinHandle<T> {
         fn new() -> Self {
             Self {
-                task: SendWrapper::new(Rc::new(RefCell::new(Task {
-                    cancelled: false,
-                    completed: false,
-                    waker_handler: None,
-                    waker_spawn_fn: None,
-                    result: None,
-                }))),
+                task: Task {
+                    state: SendWrapper::new(Rc::new(RefCell::new(State {
+                        cancelled: false,
+                        completed: false,
+                        waker_handler: None,
+                        waker_spawn_fn: None,
+                        id: Id(next_task_id()),
+                    }))),
+                    result: SendWrapper::new(Rc::new(RefCell::new(None))),
+                },
             }
         }
 
         /// Aborts this task.
         pub fn abort(&self) {
-            self.task.borrow_mut().cancel();
+            self.task.state.borrow_mut().cancel();
+        }
+
+        /// Returns a new `AbortHandle` that can be used to remotely abort this task.
+        ///
+        /// Awaiting a task cancelled by the `AbortHandle` might complete as usual if the task was
+        /// already completed at the time it was cancelled, but most likely it
+        /// will fail with a [cancelled] `JoinError`.
+        ///
+        /// [cancelled]: JoinError::is_cancelled
+        pub fn abort_handle(&self) -> AbortHandle {
+            AbortHandle {
+                state: self.task.state.clone(),
+            }
+        }
+
+        /// Returns a [task ID] that uniquely identifies this task relative to other
+        /// currently spawned tasks.
+        ///
+        /// [task ID]: crate::task::Id
+        pub fn id(&self) -> Id {
+            let state = self.task.state.borrow();
+            state.id
         }
 
         fn is_running(&self) -> bool {
-            let task = self.task.borrow();
-            !task.cancelled && !task.completed
+            let state = self.task.state.borrow();
+            !state.cancelled && !state.completed
         }
     }
 
     /// An error that can occur when waiting for the completion of a task.
     #[derive(derive_more::Display, Debug, Clone, Copy)]
-    pub enum JoinError {
+    #[display("{reason}")]
+    pub struct JoinError {
+        reason: JoinErrorReason,
+        id: Id,
+    }
+
+    #[derive(derive_more::Display, Debug, Clone, Copy)]
+    enum JoinErrorReason {
         /// The error that's returned when the task that's being waited on
         /// has been cancelled.
         #[display("task was cancelled")]
@@ -264,7 +343,7 @@ mod wasm {
         /// unwind panics in tasks.
         /// All panics just happen on the main thread anyways.
         pub fn is_cancelled(&self) -> bool {
-            matches!(self, Self::Cancelled)
+            matches!(self.reason, JoinErrorReason::Cancelled)
         }
 
         /// Returns whether this is a panic. Always `false` in Wasm,
@@ -273,23 +352,45 @@ mod wasm {
         pub fn is_panic(&self) -> bool {
             false
         }
+
+        /// Returns a task ID that identifies the task which errored relative to other currently spawned tasks.
+        pub fn id(&self) -> Id {
+            self.id
+        }
     }
 
     impl<T> Future for JoinHandle<T> {
         type Output = Result<T, JoinError>;
 
         fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-            let mut task = self.task.borrow_mut();
-            if task.cancelled {
-                return Poll::Ready(Err(JoinError::Cancelled));
+            let mut state = self.task.state.borrow_mut();
+            if state.cancelled {
+                return Poll::Ready(Err(JoinError {
+                    reason: JoinErrorReason::Cancelled,
+                    id: state.id,
+                }));
             }
 
-            if let Some(result) = task.result.take() {
+            let mut result = self.task.result.borrow_mut();
+            if let Some(result) = result.take() {
                 return Poll::Ready(Ok(result));
             }
 
-            task.register_handler(cx);
+            state.register_handler(cx);
             Poll::Pending
+        }
+    }
+
+    struct JoinHandleWithId<T>(JoinHandle<T>);
+
+    impl<T> Future for JoinHandleWithId<T> {
+        type Output = Result<(Id, T), JoinError>;
+
+        fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+            match self.0.poll(cx) {
+                Poll::Ready(out) => Poll::Ready(out.map(|out| (self.0.id(), out))),
+                Poll::Pending => Poll::Pending,
+            }
         }
     }
 
@@ -305,22 +406,50 @@ mod wasm {
 
         fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
             let this = self.project();
-            let mut task = this.handle.task.borrow_mut();
+            let mut state = this.handle.task.state.borrow_mut();
 
-            if task.cancelled {
+            if state.cancelled {
                 return Poll::Ready(());
             }
 
             match this.fut.poll(cx) {
                 Poll::Ready(value) => {
-                    task.complete(value);
+                    let _ = this.handle.task.result.borrow_mut().insert(value);
+                    state.complete();
                     Poll::Ready(())
                 }
                 Poll::Pending => {
-                    task.register_spawn_fn(cx);
+                    state.register_spawn_fn(cx);
                     Poll::Pending
                 }
             }
+        }
+    }
+
+    /// An owned permission to abort a spawned task, without awaiting its completion.
+    #[derive(Debug)]
+    pub struct AbortHandle {
+        state: SendWrapper<Rc<RefCell<State>>>,
+    }
+
+    impl AbortHandle {
+        /// Abort the task associated with the handle.
+        pub fn abort(&self) {
+            self.state.borrow_mut().cancel();
+        }
+
+        /// Returns a [task ID] that uniquely identifies this task relative to other
+        /// currently spawned tasks.
+        ///
+        /// [task ID]: crate::task::Id
+        pub fn id(&self) -> Id {
+            self.state.borrow().id
+        }
+
+        /// Checks if the task associated with this `AbortHandle` has finished.
+        pub fn is_finished(&self) -> bool {
+            let state = self.state.borrow();
+            state.cancelled && state.completed
         }
     }
 
@@ -370,7 +499,56 @@ mod wasm {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(wasm_browser, test))]
 mod test {
-    // TODO(matheus23): Test wasm shims using wasm-bindgen-test
+    use wasm_bindgen_test::wasm_bindgen_test;
+
+    use crate::task;
+
+    #[wasm_bindgen_test]
+    async fn task_abort() {
+        let h1 = task::spawn(async {});
+        let h2 = task::spawn(async {});
+        assert!(h1.id() != h2.id());
+
+        assert!(h2.await.is_ok());
+        h1.abort();
+        assert!(h1.await.err().unwrap().is_cancelled());
+    }
+
+    #[wasm_bindgen_test]
+    async fn join_set_abort() {
+        let fut = || async { 22 };
+        let mut set = task::JoinSet::new();
+        let h1 = set.spawn(fut());
+        let h2 = set.spawn(fut());
+        assert!(h1.id() != h2.id());
+        h2.abort();
+
+        let mut has_err = false;
+        let mut has_ok = false;
+        while let Some(ret) = set.join_next_with_id().await {
+            match ret {
+                Err(err) => {
+                    if !has_err {
+                        assert!(err.is_cancelled());
+                        has_err = true;
+                    } else {
+                        panic!()
+                    }
+                }
+                Ok((id, out)) => {
+                    if !has_ok {
+                        assert_eq!(id, h1.id());
+                        assert_eq!(out, 22);
+                        has_ok = true;
+                    } else {
+                        panic!()
+                    }
+                }
+            }
+        }
+        assert!(has_err);
+        assert!(has_ok);
+    }
 }
