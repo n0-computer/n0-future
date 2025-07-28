@@ -18,12 +18,13 @@ derive_more = { version = "1", features = ["debug", "display"] }
 futures-buffered = "0.2.12"
 futures-lite = "2.5"
 futures-util = { version = "0.3", features = ["sink"] }
+pin-project = "1"
 tokio = { version = "1.28", features = [] }
 tokio-util = { version = "0.7.14", features = [] }
 
 # non-wasm-in-browser dependencies
 [target.'cfg(not(all(target_family = "wasm", target_os = "unknown")))'.dependencies]
-tokio = { version = "1.28", features = ["rt", "time"] }
+tokio = { version = "1.28", features = ["rt", "time", "macros", "test-util"] }
 tokio-util = { version = "0.7.14", features = ["rt"] }
 
 # wasm-in-browser dependencies
