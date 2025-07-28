@@ -326,12 +326,12 @@
 <a href=#326 id=326 data-nosnippet>326</a>    </span><span class="attr">#[derive(derive_more::Display, Debug, Clone, Copy)]
 <a href=#327 id=327 data-nosnippet>327</a>    #[display(<span class="string">"{reason}"</span>)]
 <a href=#328 id=328 data-nosnippet>328</a>    </span><span class="kw">pub struct </span>JoinError {
-<a href=#329 id=329 data-nosnippet>329</a>        reason: JoinErrorReason,
+<a href=#329 id=329 data-nosnippet>329</a>        cause: JoinErrorCause,
 <a href=#330 id=330 data-nosnippet>330</a>        id: Id,
 <a href=#331 id=331 data-nosnippet>331</a>    }
 <a href=#332 id=332 data-nosnippet>332</a>
 <a href=#333 id=333 data-nosnippet>333</a>    <span class="attr">#[derive(derive_more::Display, Debug, Clone, Copy)]
-<a href=#334 id=334 data-nosnippet>334</a>    </span><span class="kw">enum </span>JoinErrorReason {
+<a href=#334 id=334 data-nosnippet>334</a>    </span><span class="kw">enum </span>JoinErrorCause {
 <a href=#335 id=335 data-nosnippet>335</a>        <span class="doccomment">/// The error that's returned when the task that's being waited on
 <a href=#336 id=336 data-nosnippet>336</a>        /// has been cancelled.
 <a href=#337 id=337 data-nosnippet>337</a>        </span><span class="attr">#[display(<span class="string">"task was cancelled"</span>)]
@@ -347,7 +347,7 @@
 <a href=#347 id=347 data-nosnippet>347</a>        /// unwind panics in tasks.
 <a href=#348 id=348 data-nosnippet>348</a>        /// All panics just happen on the main thread anyways.
 <a href=#349 id=349 data-nosnippet>349</a>        </span><span class="kw">pub fn </span>is_cancelled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-<a href=#350 id=350 data-nosnippet>350</a>            <span class="macro">matches!</span>(<span class="self">self</span>.reason, JoinErrorReason::Cancelled)
+<a href=#350 id=350 data-nosnippet>350</a>            <span class="macro">matches!</span>(<span class="self">self</span>.cause, JoinErrorCause::Cancelled)
 <a href=#351 id=351 data-nosnippet>351</a>        }
 <a href=#352 id=352 data-nosnippet>352</a>
 <a href=#353 id=353 data-nosnippet>353</a>        <span class="doccomment">/// Returns whether this is a panic. Always `false` in Wasm,
@@ -370,7 +370,7 @@
 <a href=#370 id=370 data-nosnippet>370</a>            <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.task.state.borrow_mut();
 <a href=#371 id=371 data-nosnippet>371</a>            <span class="kw">if </span>state.cancelled {
 <a href=#372 id=372 data-nosnippet>372</a>                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(JoinError {
-<a href=#373 id=373 data-nosnippet>373</a>                    reason: JoinErrorReason::Cancelled,
+<a href=#373 id=373 data-nosnippet>373</a>                    cause: JoinErrorCause::Cancelled,
 <a href=#374 id=374 data-nosnippet>374</a>                    id: state.id,
 <a href=#375 id=375 data-nosnippet>375</a>                }));
 <a href=#376 id=376 data-nosnippet>376</a>            }
