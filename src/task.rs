@@ -14,22 +14,21 @@ pub use wasm::*;
 mod wasm {
     use std::{
         cell::RefCell,
-        fmt::Debug,
+        fmt::{self, Debug},
         future::{Future, IntoFuture},
         pin::Pin,
         rc::Rc,
-        sync::{Mutex, OnceLock},
+        sync::Mutex,
         task::{Context, Poll, Waker},
     };
 
     use futures_lite::{stream::StreamExt, FutureExt};
     use send_wrapper::SendWrapper;
 
-    static TASK_ID_COUNTER: OnceLock<Mutex<u64>> = OnceLock::new();
+    static TASK_ID_COUNTER: Mutex<u64> = Mutex::new(0);
 
     fn next_task_id() -> u64 {
-        let inner = TASK_ID_COUNTER.get_or_init(|| Mutex::new(0));
-        let mut counter = inner.lock().unwrap();
+        let mut counter = TASK_ID_COUNTER.lock().unwrap();
         *counter += 1;
         *counter
     }
@@ -48,8 +47,8 @@ mod wasm {
         to_cancel: Vec<JoinHandle<T>>,
     }
 
-    impl<T> std::fmt::Debug for JoinSet<T> {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    impl<T> Debug for JoinSet<T> {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             f.debug_struct("JoinSet").field("len", &self.len()).finish()
         }
     }
@@ -253,7 +252,7 @@ mod wasm {
     }
 
     impl<T> Debug for JoinHandle<T> {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             if self.task.state.valid() {
                 let state = self.task.state.borrow();
                 f.debug_struct("JoinHandle")
@@ -438,7 +437,7 @@ mod wasm {
     }
 
     impl Debug for AbortHandle {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             if self.state.valid() {
                 let state = self.state.borrow();
                 f.debug_struct("AbortHandle")
