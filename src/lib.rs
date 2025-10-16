@@ -18,8 +18,8 @@ pub mod time;
 // futures-* re-exports
 
 pub use futures_buffered::*;
-pub use futures_lite::{future, io, pin, ready, stream, Future, FutureExt, Stream, StreamExt};
-pub use futures_util::{future::Either, Sink, SinkExt, TryFutureExt, TryStreamExt};
+pub use futures_lite::{Future, FutureExt, Stream, StreamExt, io, pin, ready, stream};
+pub use futures_util::{Sink, SinkExt, TryFutureExt, TryStreamExt, future::Either};
 pub use maybe_future::MaybeFuture;
 
 /// Implementation and types for splitting a `Stream + Sink`.
@@ -66,4 +66,33 @@ pub mod boxed {
     pub use futures_lite::stream::Boxed as BoxStream;
     #[cfg(wasm_browser)]
     pub use futures_lite::stream::BoxedLocal as BoxStream;
+}
+
+/// Combinators for the [`Future`] trait.
+pub mod future {
+    use std::task::Poll;
+
+    use super::pin;
+
+    pub use futures_lite::future::*;
+
+    /// Poll a future once and return the output if ready.
+    ///
+    /// Evaluates and consumes the future, returning the resulting output if the future is
+    /// ready after the first call to [`Future::poll`].
+    ///
+    /// If poll instead returns [`Poll::Pending`], `None` is returned.
+    ///
+    /// This method is useful in cases where immediacy is more important than waiting for a
+    /// result. It is also convenient for quickly obtaining the value of a future that is
+    /// known to always resolve immediately.
+    pub fn now_or_never<T, F: Future<Output = T>>(fut: F) -> Option<T> {
+        pin!(fut);
+        let waker = std::task::Waker::noop();
+        let mut cx = std::task::Context::from_waker(waker);
+        match fut.poll(&mut cx) {
+            Poll::Ready(res) => Some(res),
+            Poll::Pending => None,
+        }
+    }
 }
