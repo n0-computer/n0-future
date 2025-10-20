@@ -18,8 +18,8 @@ pub mod time;
 // futures-* re-exports
 
 pub use futures_buffered::*;
-pub use futures_lite::{Future, FutureExt, Stream, StreamExt, io, pin, ready, stream};
-pub use futures_util::{Sink, SinkExt, TryFutureExt, TryStreamExt, future::Either};
+pub use futures_lite::{io, pin, ready, stream, Future, FutureExt, Stream, StreamExt};
+pub use futures_util::{future::Either, Sink, SinkExt, TryFutureExt, TryStreamExt};
 pub use maybe_future::MaybeFuture;
 
 /// Implementation and types for splitting a `Stream + Sink`.
@@ -72,9 +72,9 @@ pub mod boxed {
 pub mod future {
     use std::task::Poll;
 
-    use super::pin;
-
     pub use futures_lite::future::*;
+
+    use super::pin;
 
     /// Poll a future once and return the output if ready.
     ///
@@ -93,6 +93,20 @@ pub mod future {
         match fut.poll(&mut cx) {
             Poll::Ready(res) => Some(res),
             Poll::Pending => None,
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn test_now_or_never_smoke() {
+            let fut = std::future::ready(0);
+            assert_eq!(now_or_never(fut), Some(0));
+
+            let fut = std::future::pending::<isize>();
+            assert_eq!(now_or_never(fut), None);
         }
     }
 }
