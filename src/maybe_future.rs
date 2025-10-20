@@ -23,7 +23,7 @@ use pin_project::pin_project;
 ///
 /// One major use case for this is ergonomically disabling branches in a `tokio::select!`.
 ///
-/// ```
+/// ```ignore-wasm32-unknown-unknown
 /// use std::time::Duration;
 ///
 /// use n0_future::{task, time, MaybeFuture};
