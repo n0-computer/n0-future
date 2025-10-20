@@ -1,6 +1,6 @@
 [package]
 name = "n0-future"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 readme = "README.md"
 description = "Number 0's way of doing rust futures. Re-exports what we think are useful abstractions and good implementations."

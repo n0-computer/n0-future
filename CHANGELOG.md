@@ -1,6 +1,17 @@
 # Changelog
 
-## [0.2.0](https://github.com/n0-computer/n0-future/compare/v0.1.3..0.2.0) - 2025-07-28
+## [0.3.0](https://github.com/n0-computer/n0-future/compare/v0.2.0..0.3.0) - 2025-10-20
+
+### ⛰️  Features
+
+- *(wasm)* Add `AbortHandle` and task ids ([#7](https://github.com/n0-computer/n0-future/issues/7)) - ([6a7062d](https://github.com/n0-computer/n0-future/commit/6a7062d4f08eb4f3ea37f894d7e9ee7ab3943532))
+- Future::now_or_never - ([9bd31cb](https://github.com/n0-computer/n0-future/commit/9bd31cb684d727fb9ee320f6f1a264439ab463b0))
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix ci tasks - ([fcc42c7](https://github.com/n0-computer/n0-future/commit/fcc42c77fefb739214c0368c6322c6bfa1658e62))
+
+## [0.2.0](https://github.com/n0-computer/n0-future/compare/v0.1.3..v0.2.0) - 2025-07-28
 
 ### ⛰️  Features
 
