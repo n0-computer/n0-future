@@ -5,6 +5,10 @@
 //! This library also allows importing a single [`task`] and [`time`] module that'll work
 //! in `wasm*-*-unknown` targets, using `wasm_bindgen` and `wasm_bindgen_futures`, but mirroring
 //! the `tokio` API with only minor differences.
+//!
+//! ## Feature flags
+//!
+//! * `serde`: Enables serde support for the [`time::SystemTime`] type when building for WebAssembly.
 
 #![deny(missing_docs, rustdoc::broken_intra_doc_links)]
 #![cfg_attr(not(test), deny(clippy::unwrap_used))]
