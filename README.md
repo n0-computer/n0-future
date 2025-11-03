@@ -29,6 +29,10 @@ We do this in a couple of ways:
 
 It's entirely possible that we'll expand the scope of this library, that currently is mostly a re-exports crate to a crate that provides our own flavor of async APIs that we deem are safer to use, we write about some of these ideas in this issue: https://github.com/n0-computer/iroh/issues/2979
 
+## Feature flags
+
+* `serde`: Enables serde support for the [`time::SystemTime`] type when building for WebAssembly.
+
 ## Note to Maintainers: Creating a release
 
 - Make sure to have `git-cliff`, `cargo-release` and `cargo-semver-checks` installed.
