@@ -1,0 +1,99 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="An extension trait for `Stream`s that provides a variety of convenient combinator functions."><title>BufferedStreamExt in n0_future - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="n0_future" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0-nightly (bdaba05a9 2025-06-27)" data-channel="nightly" data-search-js="search-179e01a3.js" data-settings-js="settings-5514c975.js" ><script src="../static.files/storage-4e99c027.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-340f468f.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../n0_future/index.html">n0_<wbr>future</a><span class="version">0.3.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Buffered<wbr>Stream<wbr>Ext</a></h2><h3><a href="#provided-methods">Provided Methods</a></h3><ul class="block"><li><a href="#method.buffered_ordered" title="buffered_ordered">buffered_ordered</a></li><li><a href="#method.buffered_unordered" title="buffered_unordered">buffered_unordered</a></li><li><a href="#method.for_each_concurrent" title="for_each_concurrent">for_each_concurrent</a></li></ul><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="index.html">In crate n0_<wbr>future</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="index.html">n0_future</a></div><h1>Trait <span class="trait">BufferedStreamExt</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"></span></div><pre class="rust item-decl"><code>pub trait BufferedStreamExt: <a class="trait" href="trait.Stream.html" title="trait n0_future::Stream">Stream</a> {
+    // Provided methods
+    fn <a href="#method.buffered_ordered" class="fn">buffered_ordered</a>(self, n: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="struct" href="struct.BufferedOrdered.html" title="struct n0_future::BufferedOrdered">BufferedOrdered</a>&lt;Self&gt;
+       <span class="where">where Self::<a class="associatedtype" href="trait.Stream.html#associatedtype.Item" title="type n0_future::Stream::Item">Item</a>: <a class="trait" href="trait.Future.html" title="trait n0_future::Future">Future</a>,
+             Self: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a></span> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.buffered_unordered" class="fn">buffered_unordered</a>(self, n: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="struct" href="struct.BufferUnordered.html" title="struct n0_future::BufferUnordered">BufferUnordered</a>&lt;Self&gt;
+       <span class="where">where Self::<a class="associatedtype" href="trait.Stream.html#associatedtype.Item" title="type n0_future::Stream::Item">Item</a>: <a class="trait" href="trait.Future.html" title="trait n0_future::Future">Future</a>,
+             Self: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a></span> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.for_each_concurrent" class="fn">for_each_concurrent</a>&lt;Fut, F&gt;(
+        self,
+        limit: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>,
+        f: F,
+    ) -&gt; ForEachConcurrent&lt;Self, Fut, F&gt;
+       <span class="where">where F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html" title="trait core::ops::function::FnMut">FnMut</a>(Self::<a class="associatedtype" href="trait.Stream.html#associatedtype.Item" title="type n0_future::Stream::Item">Item</a>) -&gt; Fut,
+             Fut: <a class="trait" href="trait.Future.html" title="trait n0_future::Future">Future</a>&lt;Output = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;,
+             Self: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a></span> { ... }
+}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>An extension trait for <code>Stream</code>s that provides a variety of convenient
+combinator functions.</p>
+</div></details><h2 id="provided-methods" class="section-header">Provided Methods<a href="#provided-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="method.buffered_ordered" class="method"><h4 class="code-header">fn <a href="#method.buffered_ordered" class="fn">buffered_ordered</a>(self, n: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="struct" href="struct.BufferedOrdered.html" title="struct n0_future::BufferedOrdered">BufferedOrdered</a>&lt;Self&gt;<div class="where">where
+    Self::<a class="associatedtype" href="trait.Stream.html#associatedtype.Item" title="type n0_future::Stream::Item">Item</a>: <a class="trait" href="trait.Future.html" title="trait n0_future::Future">Future</a>,
+    Self: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,</div></h4></section></summary><div class="docblock"><p>An adaptor for creating a buffered list of pending futures.</p>
+<p>If this stream’s item can be converted into a future, then this adaptor
+will buffer up to at most <code>n</code> futures and then return the outputs in the
+same order as the underlying stream. No more than <code>n</code> futures will be
+buffered at any point in time, and less than <code>n</code> may also be buffered
+depending on the state of each future.</p>
+<p>The returned stream will be a stream of each future’s output.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.buffered_unordered" class="method"><h4 class="code-header">fn <a href="#method.buffered_unordered" class="fn">buffered_unordered</a>(self, n: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="struct" href="struct.BufferUnordered.html" title="struct n0_future::BufferUnordered">BufferUnordered</a>&lt;Self&gt;<div class="where">where
+    Self::<a class="associatedtype" href="trait.Stream.html#associatedtype.Item" title="type n0_future::Stream::Item">Item</a>: <a class="trait" href="trait.Future.html" title="trait n0_future::Future">Future</a>,
+    Self: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,</div></h4></section></summary><div class="docblock"><p>An adaptor for creating a buffered list of pending futures (unordered).</p>
+<p>If this stream’s item can be converted into a future, then this adaptor
+will buffer up to <code>n</code> futures and then return the outputs in the order
+in which they complete. No more than <code>n</code> futures will be buffered at
+any point in time, and less than <code>n</code> may also be buffered depending on
+the state of each future.</p>
+<p>The returned stream will be a stream of each future’s output.</p>
+<h5 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>futures::channel::oneshot;
+<span class="kw">use </span>futures::stream::{<span class="self">self</span>, StreamExt};
+<span class="kw">use </span>futures_buffered::BufferedStreamExt;
+
+<span class="kw">let </span>(send_one, recv_one) = oneshot::channel();
+<span class="kw">let </span>(send_two, recv_two) = oneshot::channel();
+
+<span class="kw">let </span>stream_of_futures = stream::iter(<span class="macro">vec!</span>[recv_one, recv_two]);
+<span class="kw">let </span><span class="kw-2">mut </span>buffered = stream_of_futures.buffered_unordered(<span class="number">10</span>);
+
+send_two.send(<span class="number">2i32</span>)<span class="question-mark">?</span>;
+<span class="macro">assert_eq!</span>(buffered.next().<span class="kw">await</span>, <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="number">2i32</span>)));
+
+send_one.send(<span class="number">1i32</span>)<span class="question-mark">?</span>;
+<span class="macro">assert_eq!</span>(buffered.next().<span class="kw">await</span>, <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="number">1i32</span>)));
+
+<span class="macro">assert_eq!</span>(buffered.next().<span class="kw">await</span>, <span class="prelude-val">None</span>);</code></pre></div>
+<p>See <a href="struct.BufferUnordered.html" title="struct n0_future::BufferUnordered"><code>BufferUnordered</code></a> for performance details</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.for_each_concurrent" class="method"><h4 class="code-header">fn <a href="#method.for_each_concurrent" class="fn">for_each_concurrent</a>&lt;Fut, F&gt;(
+    self,
+    limit: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>,
+    f: F,
+) -&gt; ForEachConcurrent&lt;Self, Fut, F&gt;<div class="where">where
+    F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnMut.html" title="trait core::ops::function::FnMut">FnMut</a>(Self::<a class="associatedtype" href="trait.Stream.html#associatedtype.Item" title="type n0_future::Stream::Item">Item</a>) -&gt; Fut,
+    Fut: <a class="trait" href="trait.Future.html" title="trait n0_future::Future">Future</a>&lt;Output = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;,
+    Self: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,</div></h4></section></summary><div class="docblock"><p>Runs this stream to completion, executing the provided asynchronous
+closure for each element on the stream concurrently as elements become
+available.</p>
+<p>This is similar to <a href="futures_util::StreamExt::for_each"><code>StreamExt::for_each</code></a>, but the futures
+produced by the closure are run concurrently (but not in parallel–
+this combinator does not introduce any threads).</p>
+<p>The closure provided will be called for each item this stream produces,
+yielding a future. That future will then be executed to completion
+concurrently with the other futures produced by the closure.</p>
+<p>The first argument is an optional limit on the number of concurrent
+futures. If this limit is not <code>None</code>, no more than <code>limit</code> futures
+will be run concurrently. The <code>limit</code> argument is of type
+<code>Into&lt;Option&lt;usize&gt;&gt;</code>, and so can be provided as either <code>None</code>,
+<code>Some(10)</code>, or just <code>10</code>. Note: a limit of zero is interpreted as
+no limit at all, and will have the same result as passing in <code>None</code>.</p>
+<p>This method is only available when the <code>std</code> or <code>alloc</code> feature of this
+library is activated, and it is activated by default.</p>
+<h5 id="examples-1"><a class="doc-anchor" href="#examples-1">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>futures::channel::oneshot;
+<span class="kw">use </span>futures::stream::{<span class="self">self</span>, StreamExt};
+
+<span class="kw">let </span>(tx1, rx1) = oneshot::channel();
+<span class="kw">let </span>(tx2, rx2) = oneshot::channel();
+<span class="kw">let </span>(tx3, rx3) = oneshot::channel();
+
+<span class="kw">let </span>fut = stream::iter(<span class="macro">vec!</span>[rx1, rx2, rx3]).for_each_concurrent(
+    <span class="comment">/* limit */ </span><span class="number">2</span>,
+    |rx| <span class="kw">async move </span>{
+        rx.<span class="kw">await</span>.unwrap();
+    }
+);
+tx1.send(()).unwrap();
+tx2.send(()).unwrap();
+tx3.send(()).unwrap();
+fut.<span class="kw">await</span>;</code></pre></div>
+</div></details></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><section id="impl-BufferedStreamExt-for-T" class="impl"><a href="#impl-BufferedStreamExt-for-T" class="anchor">§</a><h3 class="code-header">impl&lt;T&gt; <a class="trait" href="trait.BufferedStreamExt.html" title="trait n0_future::BufferedStreamExt">BufferedStreamExt</a> for T<div class="where">where
+    T: <a class="trait" href="trait.Stream.html" title="trait n0_future::Stream">Stream</a> + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,</div></h3></section></div><script src="../trait.impl/futures_buffered/buffered/trait.BufferedStreamExt.js" async></script></section></div></main></body></html>
