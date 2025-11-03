@@ -92,6 +92,17 @@ mod wasm {
             AbortHandle { state }
         }
 
+        /// Alias to [`Self::spawn`].
+        ///
+        /// Mirrors [`tokio::JoinSet::spawn_local](https://docs.rs/tokio/latest/tokio/task/struct.JoinSet.html#method.spawn_local).
+        /// Because all tasks in WebAssembly are local, this is a simple alias to [`Self::spawn`].
+        pub fn spawn_local(&mut self, fut: impl IntoFuture<Output = T> + 'static) -> AbortHandle
+        where
+            T: 'static,
+        {
+            self.spawn(fut)
+        }
+
         /// Aborts all tasks inside this `JoinSet`
         pub fn abort_all(&self) {
             self.to_cancel.iter().for_each(JoinHandle::abort);
