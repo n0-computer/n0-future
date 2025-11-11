@@ -1,6 +1,13 @@
 # Changelog
 
-## [0.3.0](https://github.com/n0-computer/n0-future/compare/v0.2.0..0.3.0) - 2025-10-20
+## [0.3.1](https://github.com/n0-computer/n0-future/compare/v0.3.0..0.3.1) - 2025-11-11
+
+### ⛰️  Features
+
+- Add JoinSet::spawn_local ([#16](https://github.com/n0-computer/n0-future/issues/16)) - ([0704b54](https://github.com/n0-computer/n0-future/commit/0704b5474f5205042dc4fa23c1ca355dddd8434b))
+- Add serde feature for web_time::SystemTime ([#17](https://github.com/n0-computer/n0-future/issues/17)) - ([f5ea6ed](https://github.com/n0-computer/n0-future/commit/f5ea6ede1f468658fda2cbd7764b6679c8d2898c))
+
+## [0.3.0](https://github.com/n0-computer/n0-future/compare/v0.2.0..v0.3.0) - 2025-10-20
 
 ### ⛰️  Features
 
