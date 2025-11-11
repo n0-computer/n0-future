@@ -252,7 +252,7 @@ dependencies = [
 
 [[package]]
 name = "n0-future"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "cfg_aliases",
  "derive_more",

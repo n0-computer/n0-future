@@ -37,8 +37,10 @@ It's entirely possible that we'll expand the scope of this library, that current
 
 - Make sure to have `git-cliff`, `cargo-release` and `cargo-semver-checks` installed.
 - Figure out whether this release is major/minor/patch by running `cargo semver-checks check-release --release-type=major/minor/patch` and see which one fits
-- Run `cargo release major/minor/patch` to check if the release would go through well.
-- Run `cargo release major/minor/patch --execute` to run the release
+- Use `git-cliff` to generate the changelog
+- Bump the version by major/minor/patch in `Cargo.toml` and create a release prep PR.
+- Run `cargo release` to check if the release would go through well.
+- Run `cargo release --execute` to run the release
 
 ## License
 
