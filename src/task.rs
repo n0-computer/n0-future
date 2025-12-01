@@ -9,7 +9,7 @@ pub use tokio::spawn;
 /// If possible uses `name` to name the task
 #[cfg(all(not(wasm_browser), not(tokio_unstable)))]
 #[track_caller]
-pub fn spawn_with_name<'a, F>(_name: &'a str, future: F) -> JoinHandle<F::Output>
+pub fn spawn_with_name<F>(_name: &str, future: F) -> JoinHandle<F::Output>
 where
     F: std::future::Future + Send + 'static,
     F::Output: Send + 'static,
@@ -22,7 +22,7 @@ where
 /// If possible uses `name` to name the task
 #[cfg(all(not(wasm_browser), tokio_unstable, feature = "tracing"))]
 #[track_caller]
-pub fn spawn_with_name<'a, F>(name: &'a str, future: F) -> JoinHandle<F::Output>
+pub fn spawn_with_name<F>(name: &str, future: F) -> JoinHandle<F::Output>
 where
     F: std::future::Future + Send + 'static,
     F::Output: Send + 'static,
@@ -52,7 +52,7 @@ mod wasm {
         task::{Context, Poll, Waker},
     };
 
-    use futures_lite::{FutureExt, stream::StreamExt};
+    use futures_lite::{stream::StreamExt, FutureExt};
     use send_wrapper::SendWrapper;
 
     static TASK_ID_COUNTER: Mutex<u64> = Mutex::new(0);
@@ -582,10 +582,10 @@ mod wasm {
     /// Spawns a future as a task in the browser runtime.
     ///
     /// If possible uses `name` to name the task
-    pub fn spawn_with_name<'a>(
-        _name: &'a str,
+    pub fn spawn_with_name<T: 'static>(
+        _name: &str,
         fut: impl IntoFuture<Output = T> + 'static,
-    ) -> AbortHandle
+    ) -> JoinHandle<T>
     where
         T: 'static,
     {
