@@ -3,6 +3,36 @@
 
 #[cfg(not(wasm_browser))]
 pub use tokio::spawn;
+
+/// Spawns a future as a task.
+///
+/// If possible uses `name` to name the task
+#[cfg(all(not(wasm_browser), not(tokio_unstable)))]
+#[track_caller]
+pub fn spawn_with_name<'a, F>(_name: &'a str, future: F) -> JoinHandle<F::Output>
+where
+    F: std::future::Future + Send + 'static,
+    F::Output: Send + 'static,
+{
+    spawn(future)
+}
+
+/// Spawns a future as a task.
+///
+/// If possible uses `name` to name the task
+#[cfg(all(not(wasm_browser), tokio_unstable, feature = "tracing"))]
+#[track_caller]
+pub fn spawn_with_name<'a, F>(name: &'a str, future: F) -> JoinHandle<F::Output>
+where
+    F: std::future::Future + Send + 'static,
+    F::Output: Send + 'static,
+{
+    tokio::task::Builder::new()
+        .name(name)
+        .spawn(future)
+        .expect("doesn't fails")
+}
+
 #[cfg(not(wasm_browser))]
 pub use tokio::task::{AbortHandle, Id, JoinError, JoinHandle, JoinSet};
 #[cfg(not(wasm_browser))]
@@ -22,7 +52,7 @@ mod wasm {
         task::{Context, Poll, Waker},
     };
 
-    use futures_lite::{stream::StreamExt, FutureExt};
+    use futures_lite::{FutureExt, stream::StreamExt};
     use send_wrapper::SendWrapper;
 
     static TASK_ID_COUNTER: Mutex<u64> = Mutex::new(0);
@@ -548,6 +578,19 @@ mod wasm {
 
         handle
     }
+
+    /// Spawns a future as a task in the browser runtime.
+    ///
+    /// If possible uses `name` to name the task
+    pub fn spawn_with_name<'a>(
+        _name: &'a str,
+        fut: impl IntoFuture<Output = T> + 'static,
+    ) -> AbortHandle
+    where
+        T: 'static,
+    {
+        spawn(fut)
+    }
 }
 
 #[cfg(test)]
@@ -560,6 +603,14 @@ mod test {
     use wasm_bindgen_test::wasm_bindgen_test as test;
 
     use crate::task;
+
+    #[test]
+    async fn task_with_name() {
+        let h1 = task::spawn_with_name("test", async {
+            crate::time::sleep(Duration::from_millis(10)).await;
+        });
+        h1.await.unwrap();
+    }
 
     #[test]
     async fn task_abort() {
