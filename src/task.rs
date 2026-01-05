@@ -427,6 +427,14 @@ mod wasm {
             false
         }
 
+        /// Returns the panic, if the task has panicked.
+        ///
+        /// Always returns `Err(self)`, in Wasm, because when a task panics, it's not unwound,
+        /// instead it panics directly to the main thread.
+        pub fn try_into_panic(self) -> Result<Box<dyn std::any::Any + Send + 'static>, JoinError> {
+            Err(self)
+        }
+
         /// Returns a task ID that identifies the task which errored relative to other currently spawned tasks.
         pub fn id(&self) -> Id {
             self.id
