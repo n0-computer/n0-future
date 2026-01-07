@@ -1,6 +1,16 @@
 # Changelog
 
-## [0.3.1](https://github.com/n0-computer/n0-future/compare/v0.3.0..0.3.1) - 2025-11-11
+## [0.3.2](https://github.com/n0-computer/n0-future/compare/v0.3.1..0.3.2) - 2026-01-07
+
+### ⛰️  Features
+
+- Implement `JoinSet::poll_join_next*` and `JoinError::try_into_panic` ([#23](https://github.com/n0-computer/n0-future/issues/23)) - ([4ecea8f](https://github.com/n0-computer/n0-future/commit/4ecea8f83994d993d34aec9bc3173055fa63999c))
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump derive_more ([#22](https://github.com/n0-computer/n0-future/issues/22)) - ([0464e04](https://github.com/n0-computer/n0-future/commit/0464e04cd86c68cd3643f6637a3e23e53b9c5418))
+
+## [0.3.1](https://github.com/n0-computer/n0-future/compare/v0.3.0..v0.3.1) - 2025-11-11
 
 ### ⛰️  Features
 
