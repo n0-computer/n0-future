@@ -137,13 +137,72 @@ mod wasm {
         /// [task ID]: crate::task::Id
         /// [`JoinError::id`]: fn@crate::task::JoinError::id
         pub async fn join_next_with_id(&mut self) -> Option<Result<(Id, T), JoinError>> {
-            futures_lite::future::poll_fn(|cx| {
-                let ret = self.handles.poll_next(cx);
-                // clean up handles that are either cancelled or have finished
-                self.to_cancel.retain(JoinHandle::is_running);
-                ret
-            })
-            .await
+            futures_lite::future::poll_fn(|cx| self.poll_join_next_with_id(cx)).await
+        }
+
+        /// Polls for one of the tasks in the set to complete.
+        ///
+        /// If this returns `Poll::Ready(Some(_))`, then the task that completed is removed from the set.
+        ///
+        /// When the method returns `Poll::Pending`, the `Waker` in the provided `Context` is scheduled
+        /// to receive a wakeup when a task in the `JoinSet` completes. Note that on multiple calls to
+        /// `poll_join_next`, only the `Waker` from the `Context` passed to the most recent call is
+        /// scheduled to receive a wakeup.
+        ///
+        /// # Returns
+        ///
+        /// This function returns:
+        ///
+        ///  * `Poll::Pending` if the `JoinSet` is not empty but there is no task whose output is
+        ///    available right now.
+        ///  * `Poll::Ready(Some(Ok(value)))` if one of the tasks in this `JoinSet` has completed.
+        ///    The `value` is the return value of one of the tasks that completed.
+        ///  * `Poll::Ready(Some(Err(err)))` if one of the tasks in this `JoinSet` has panicked or been
+        ///    aborted. The `err` is the `JoinError` from the panicked/aborted task.
+        ///  * `Poll::Ready(None)` if the `JoinSet` is empty.
+        pub fn poll_join_next(
+            &mut self,
+            cx: &mut Context<'_>,
+        ) -> Poll<Option<Result<T, JoinError>>> {
+            match self.poll_join_next_with_id(cx) {
+                Poll::Ready(Some(Ok((_, ret)))) => Poll::Ready(Some(Ok(ret))),
+                Poll::Ready(Some(Err(e))) => Poll::Ready(Some(Err(e))),
+                Poll::Ready(None) => Poll::Ready(None),
+                Poll::Pending => Poll::Pending,
+            }
+        }
+
+        /// Polls for one of the tasks in the set to complete.
+        ///
+        /// If this returns `Poll::Ready(Some(_))`, then the task that completed is removed from the set.
+        ///
+        /// When the method returns `Poll::Pending`, the `Waker` in the provided `Context` is scheduled
+        /// to receive a wakeup when a task in the `JoinSet` completes. Note that on multiple calls to
+        /// `poll_join_next`, only the `Waker` from the `Context` passed to the most recent call is
+        /// scheduled to receive a wakeup.
+        ///
+        /// # Returns
+        ///
+        /// This function returns:
+        ///
+        ///  * `Poll::Pending` if the `JoinSet` is not empty but there is no task whose output is
+        ///    available right now.
+        ///  * `Poll::Ready(Some(Ok((id, value))))` if one of the tasks in this `JoinSet` has completed.
+        ///    The `value` is the return value of one of the tasks that completed, and
+        ///    `id` is the [task ID] of that task.
+        ///  * `Poll::Ready(Some(Err(err)))` if one of the tasks in this `JoinSet` has panicked or been
+        ///    aborted. The `err` is the `JoinError` from the panicked/aborted task.
+        ///  * `Poll::Ready(None)` if the `JoinSet` is empty.
+        ///
+        /// [task ID]: crate::task::Id
+        pub fn poll_join_next_with_id(
+            &mut self,
+            cx: &mut Context<'_>,
+        ) -> Poll<Option<Result<(Id, T), JoinError>>> {
+            let ret = self.handles.poll_next(cx);
+            // clean up handles that are either cancelled or have finished
+            self.to_cancel.retain(JoinHandle::is_running);
+            ret
         }
 
         /// Returns whether there's any tasks that are either still running or
@@ -366,6 +425,14 @@ mod wasm {
         /// panics directly to the main thread.
         pub fn is_panic(&self) -> bool {
             false
+        }
+
+        /// Returns the panic, if the task has panicked.
+        ///
+        /// Always returns `Err(self)`, in Wasm, because when a task panics, it's not unwound,
+        /// instead it panics directly to the main thread.
+        pub fn try_into_panic(self) -> Result<Box<dyn std::any::Any + Send + 'static>, JoinError> {
+            Err(self)
         }
 
         /// Returns a task ID that identifies the task which errored relative to other currently spawned tasks.
