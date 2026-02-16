@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["split"],"struct":["SplitSink","SplitStream"]};
