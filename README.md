@@ -1,5 +1,13 @@
 # [n0-future](https://m.youtube.com/watch?v=enGlMJZOi2I&t=147s)
 
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square)](https://docs.rs/n0-future/)
+[![Crates.io](https://img.shields.io/crates/v/n0-future.svg?style=flat-square)](https://crates.io/crates/n0-future)
+[![downloads](https://img.shields.io/crates/d/n0-future.svg?style=flat-square)](https://crates.io/crates/n0-future)
+[![Chat](https://img.shields.io/discord/1161119546170687619?logo=discord&style=flat-square)](https://discord.com/invite/DpmJgtU7cW)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE-MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](LICENSE-APACHE)
+[![CI](https://img.shields.io/github/actions/workflow/status/n0-computer/n0-future/ci.yaml?branch=main&style=flat-square&label=CI)](https://github.com/n0-computer/n0-future/actions/workflows/ci.yaml)
+
 [number 0]'s way of doing async rust.
 
 This crate is supposed to fulfill two purposes:
@@ -44,7 +52,7 @@ It's entirely possible that we'll expand the scope of this library, that current
 
 ## License
 
-Copyright 2024 N0, INC.
+Copyright 2025 N0, INC.
 
 This project is licensed under either of
 
