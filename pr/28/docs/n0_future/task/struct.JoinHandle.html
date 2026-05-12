@@ -8,6 +8,9 @@ means that there is no longer any handle to the task, and no way to <code>join</
 on it.</p>
 <p>This <code>struct</code> is created by the <a href="fn.spawn.html" title="fn n0_future::task::spawn"><code>task::spawn</code></a> and <a href="crate::task::spawn_blocking"><code>task::spawn_blocking</code></a>
 functions.</p>
+<p>It is guaranteed that the destructor of the spawned task has finished
+before task completion is observed via <code>JoinHandle</code> <code>await</code>,
+<a href="struct.JoinHandle.html#method.is_finished" title="method n0_future::task::JoinHandle::is_finished"><code>JoinHandle::is_finished</code></a> or <a href="struct.AbortHandle.html#method.is_finished" title="method n0_future::task::AbortHandle::is_finished"><code>AbortHandle::is_finished</code></a>.</p>
 <h2 id="cancel-safety"><a class="doc-anchor" href="#cancel-safety">§</a>Cancel safety</h2>
 <p>The <code>&amp;mut JoinHandle&lt;T&gt;</code> type is cancel safe. If it is used as the event
 in a <code>tokio::select!</code> statement and some other branch completes first,
@@ -205,14 +208,12 @@ the current task for wakeup if the value is not yet available. <a href="../trait
     cancellation_token: &amp;CancellationToken,
 ) -&gt; WithCancellationTokenFuture&lt;'_, Self&gt;<div class="where">where
     Self: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,</div></h4></section></summary><div class='docblock'>Similar to [<code>CancellationToken::run_until_cancelled</code>],
-but with the advantage that it is easier to write fluent call chains,
-and biased towards waiting for [<code>CancellationToken</code>] to complete. <a>Read more</a></div></details><details class="toggle method-toggle" open><summary><section id="method.with_cancellation_token_owned" class="method trait-impl"><a href="#method.with_cancellation_token_owned" class="anchor">§</a><h4 class="code-header">fn <a class="fn">with_cancellation_token_owned</a>(
+but with the advantage that it is easier to write fluent call chains. <a>Read more</a></div></details><details class="toggle method-toggle" open><summary><section id="method.with_cancellation_token_owned" class="method trait-impl"><a href="#method.with_cancellation_token_owned" class="anchor">§</a><h4 class="code-header">fn <a class="fn">with_cancellation_token_owned</a>(
     self,
     cancellation_token: CancellationToken,
 ) -&gt; WithCancellationTokenFutureOwned&lt;Self&gt;<div class="where">where
     Self: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,</div></h4></section></summary><div class='docblock'>Similar to [<code>CancellationToken::run_until_cancelled_owned</code>],
-but with the advantage that it is easier to write fluent call chains,
-and biased towards waiting for [<code>CancellationToken</code>] to complete. <a>Read more</a></div></details></div></details><details class="toggle implementors-toggle"><summary><section id="impl-FutureExt-for-T-1" class="impl"><a href="#impl-FutureExt-for-T-1" class="anchor">§</a><h3 class="code-header">impl&lt;T&gt; FutureExt for T<div class="where">where
+but with the advantage that it is easier to write fluent call chains. <a>Read more</a></div></details></div></details><details class="toggle implementors-toggle"><summary><section id="impl-FutureExt-for-T-1" class="impl"><a href="#impl-FutureExt-for-T-1" class="anchor">§</a><h3 class="code-header">impl&lt;T&gt; FutureExt for T<div class="where">where
     T: <a class="trait" href="../trait.Future.html" title="trait n0_future::Future">Future</a> + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,</div></h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.map" class="method trait-impl"><a href="#method.map" class="anchor">§</a><h4 class="code-header">fn <a class="fn">map</a>&lt;U, F&gt;(self, f: F) -&gt; Map&lt;Self, F&gt; <a href="#" class="tooltip" data-notable-ty="Map&lt;Self, F&gt;">ⓘ</a><div class="where">where
     F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>(Self::<a class="associatedtype" href="../trait.Future.html#associatedtype.Output" title="type n0_future::Future::Output">Output</a>) -&gt; U,
     Self: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,</div></h4></section></summary><div class='docblock'>Map this future’s output to a different type, returning a new future of

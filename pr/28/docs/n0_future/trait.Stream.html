@@ -408,17 +408,19 @@ stream.</p>
 The stream will never return <a href="https://doc.rust-lang.org/nightly/core/task/poll/enum.Poll.html#variant.Pending" title="variant core::task::poll::Poll::Pending">Poll::Pending</a>
 so polling it in a tight loop is worse than using a blocking synchronous function.</p>
 </div></section></summary><div class="docblock">
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>futures::task::Poll;
-<span class="kw">use </span>futures::{StreamExt, future, pin_mut};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::pin::pin;
+
+<span class="kw">use </span>futures::task::Poll;
+<span class="kw">use </span>futures::{StreamExt, future};
 <span class="kw">use </span>future::FusedFuture;
 
 <span class="kw">let </span>f = <span class="kw">async </span>{ <span class="number">1_u32 </span>};
-<span class="macro">pin_mut!</span>(f);
+<span class="kw">let </span>f = <span class="macro">pin!</span>(f);
 <span class="kw">let </span><span class="kw-2">mut </span>r = future::poll_immediate(f);
 <span class="macro">assert_eq!</span>(r.next().<span class="kw">await</span>, <span class="prelude-val">Some</span>(Poll::Ready(<span class="number">1</span>)));
 
 <span class="kw">let </span>f = <span class="kw">async </span>{<span class="macro">futures::pending!</span>(); <span class="number">42_u8</span>};
-<span class="macro">pin_mut!</span>(f);
+<span class="kw">let </span>f = <span class="macro">pin!</span>(f);
 <span class="kw">let </span><span class="kw-2">mut </span>p = future::poll_immediate(f);
 <span class="macro">assert_eq!</span>(p.next().<span class="kw">await</span>, <span class="prelude-val">Some</span>(Poll::Pending));
 <span class="macro">assert!</span>(!p.is_terminated());
