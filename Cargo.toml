@@ -58,10 +58,11 @@ missing_debug_implementations = "warn"
 # dependencies require a feature enabled when using `--cfg docsrs` which
 # we can not do.  To enable for a crate set
 # `#![cfg_attr(n0_future_docsrs, feature(doc_auto_cfg))]` in the crate.
-unexpected_cfgs = { level = "warn", check-cfg = ["cfg(n0_future_docsrs)"] }
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(n0_future_docsrs)", "cfg(tokio_unstable)"] }
 
 [lints.clippy]
 unused-async = "warn"
 
 [features]
 serde = ["web-time/serde"]
+tracing = ["tokio/tracing"]
