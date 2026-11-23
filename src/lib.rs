@@ -23,7 +23,9 @@ pub mod time;
 
 pub use futures_buffered::*;
 pub use futures_lite::{io, pin, ready, stream, Future, FutureExt, Stream, StreamExt};
-pub use futures_util::{future::Either, Sink, SinkExt, TryFutureExt, TryStreamExt};
+pub use futures_util::{
+    future::Either, stream::FusedStream, Sink, SinkExt, TryFutureExt, TryStreamExt,
+};
 pub use maybe_future::MaybeFuture;
 
 /// Implementation and types for splitting a `Stream + Sink`.
