@@ -14,13 +14,10 @@ rust-version = "1.85"
 
 
 [dependencies]
-derive_more = { version = "2", features = ["debug", "deref", "display"] }
 futures-buffered = "0.2.12"
 futures-lite = "2.5"
 futures-util = { version = "0.3", features = ["sink"] }
 pin-project = "1"
-tokio = { version = "1.28", features = [] }
-tokio-util = { version = "0.7.14", features = [] }
 
 # non-wasm-in-browser dependencies
 [target.'cfg(not(all(target_family = "wasm", target_os = "unknown")))'.dependencies]
@@ -29,6 +26,7 @@ tokio-util = { version = "0.7.14", features = ["rt"] }
 
 # wasm-in-browser dependencies
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
+derive_more = { version = "2", features = ["debug", "deref", "display"] }
 futures-util = "0.3"
 js-sys = "0.3"
 pin-project = "1"
@@ -42,7 +40,7 @@ send_wrapper = "0.6"
 wasm-bindgen-test = "0.3.50"
 
 [build-dependencies]
-cfg_aliases = { version = "0.2" }
+cfg_aliases = { version = "0.2.2" }
 
 
 # Package settings
@@ -61,7 +59,7 @@ missing_debug_implementations = "warn"
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(n0_future_docsrs)"] }
 
 [lints.clippy]
-unused-async = "warn"
+unused_async = "warn"
 
 [features]
 serde = ["web-time/serde"]
